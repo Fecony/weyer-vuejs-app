@@ -1,4 +1,14 @@
-# weyer-spotify-vue
+# Weyer
+
+Simple web player using Spotify API on Vue
+
+## TODO List
+* Create other views
+* _REMOVE JUNK CODE_
+* Connect with Spotify API
+* Fetch data for tracks & albums
+* Create user login ?
+* ...
 
 ## Project setup
 ```
@@ -9,21 +19,3 @@ npm install
 ```
 npm run serve
 ```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

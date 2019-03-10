@@ -1,12 +1,23 @@
 <template>
   <div id="app">
+    <CurrentTime></CurrentTime>
     <div id="nav">
       <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/about">About</router-link> |
     </div>
     <router-view/>
   </div>
 </template>
+
+<script>
+import CurrentTime from '@/components/CurrentTime.vue'
+
+export default {
+  components: {
+    CurrentTime
+  }
+}
+</script>
 
 <style lang="less">
 #app {
