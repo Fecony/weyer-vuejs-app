@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <MainView msg="Welcome to Weyer"/>
+    <MainView></MainView>
   </div>
 </template>
 

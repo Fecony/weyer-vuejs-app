@@ -25,3 +25,12 @@ export default {
   }
 }
 </script>
+
+<style lang="less" scoped>
+.time {
+  h1 {
+    font-size: 40px;
+    color: #000;
+  }
+}
+</style>
