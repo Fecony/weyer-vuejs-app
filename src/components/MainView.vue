@@ -1,6 +1,8 @@
 <template>
   <div class="main">
     <h1 class="title">Search</h1>
+    <div class="alert alert-danger" v-if="error">{{ error }}</div>
+    <div class="alert" v-if="loading">Loading...</div>
     <form @submit.prevent="sendForm">
       <div class="search">
         <input v-model="text" type="text" placeholder="Search for song...">
@@ -8,37 +10,57 @@
           <i :class="type"></i>
         </a>
       </div>
-      <input :disabled="disabled" type="submit" class="search-btn" value="Search"/>
+      <input :disabled="textIsEmpty" type="submit" class="search-btn" value="Search">
     </form>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "MainView",
   data() {
     return {
       type: "track",
-      text: null,
-      disabled: true
+      text: "",
+      disabled: true,
+      loading: false,
+      error: false
     };
   },
-  watch: {
-    text: function(val) {
-      if (this.text && this.text.length > 0) {
-        this.disabled = false;
-      } else {
-        this.disabled = true;
-      }
+  created() {
+    this.fetch();
+  },
+  computed: {
+    textIsEmpty: function() {
+      return this.text.length == 0;
     }
   },
   methods: {
     changeType() {
       this.type = this.type === "track" ? "album" : "track";
     },
+    async fetch() {
+      this.loading = true;
+      await axios
+        .get("http://localhost:8888/")
+        .then(response => {
+          this.$root.TOKEN = response.data;
+          this.text = "";
+          this.error = false;
+        })
+        .catch(e => {
+          this.error = e;
+          console.log(e);
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
     sendForm() {
       // console.log(this.text + " | " + this.type);
-      this.text = null;
+      this.text = "";
     }
   }
 };
@@ -50,6 +72,29 @@ export default {
     font-size: 60px;
     font-family: "Roboto", sans-serif;
     color: #2a3757;
+  }
+  .alert {
+    border-radius: 5px;
+    width: 40%;
+    margin: 0 auto;
+    text-align: left;
+    position: relative;
+    padding: 10px 10px 10px 40px;
+    color: white;
+    font-weight: 600;
+    background: #2a3757;
+    opacity: 0.8;
+    position: relative;
+    &-danger {
+      background: rgb(220, 21, 21);
+      &:before {
+        content: "\26A0";
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+    }
   }
   .search {
     width: 506px;
@@ -128,8 +173,8 @@ export default {
       background: rgb(66, 182, 111);
     }
     &:disabled {
-      background: gray;
-      cursor: default; 
+      opacity: 0.5;
+      cursor: not-allowed;
     }
   }
   @media (max-width: 320px) {
@@ -144,6 +189,10 @@ export default {
     .search {
       width: 100%;
       margin-top: 0;
+    }
+    .alert {
+      margin-bottom: 20px;
+      width: 85%;
     }
   }
 }
