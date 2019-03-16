@@ -13,9 +13,9 @@ Simple web player using Spotify API on Vue
 ## Project setup
 ```
 npm install
-```
+export VUE_APP_TOKEN_URL=[URL TO TOKEN]
+export VUE_APP_REFRESH_URL=[URL TO REFRESH TOKEN]
 
-### Compiles and hot-reloads for development
-```
+*Compiles and hot-reloads for development*
 npm run serve
 ```

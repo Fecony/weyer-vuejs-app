@@ -2,8 +2,8 @@
   <div class="main">
     <h1 class="title">Search</h1>
     <div class="alert alert-danger" v-if="error">{{ error }}</div>
-    <div class="alert" v-if="loading">Loading...</div>
-    <form @submit.prevent="sendForm">
+    <div class="alert alert-loading" v-if="loading">Loading...</div>
+    <form @submit.prevent="sendForm" ref="form">
       <div class="search">
         <input v-model="text" type="text" placeholder="Search for song...">
         <a @click="changeType" class="icon">
@@ -17,6 +17,7 @@
 
 <script>
 import axios from "axios";
+import router from "../router";
 
 export default {
   name: "MainView",
@@ -26,7 +27,8 @@ export default {
       text: "",
       disabled: true,
       loading: false,
-      error: false
+      error: null,
+      items: []
     };
   },
   created() {
@@ -43,15 +45,14 @@ export default {
     },
     async fetch() {
       this.loading = true;
-      await axios
-        .get("http://localhost:8888/")
+      await axios.get(process.env.VUE_APP_TOKEN_URL || "http://localhost:8888/")
         .then(response => {
           this.$root.TOKEN = response.data;
           this.text = "";
-          this.error = false;
+          this.error = null;
         })
         .catch(e => {
-          this.error = e;
+          this.error = e.response.data.error.message;
           console.log(e);
         })
         .finally(() => {
@@ -59,8 +60,49 @@ export default {
         });
     },
     sendForm() {
-      // console.log(this.text + " | " + this.type);
-      this.text = "";
+      this.loading = true;
+      axios
+        .get(
+          `https://api.spotify.com/v1/search?query=${this.text}&type=${this.type}`,
+          {
+            headers: {
+              Authorization: `Bearer ${this.$root.TOKEN}`
+            }
+          }
+        )
+        .then(response => {
+          var type = this.type + "s";
+          this.items = {
+            type,
+            data: response.data[`${type}`].items
+          };
+          router.push({
+            name: "search",
+            params: {
+              results: this.items
+            }
+          });
+          this.text = "";
+        })
+        .catch(e => {
+          this.error = e.response.data.error.message;
+          if (e.response.data.error.status == 401) {
+            this.refreshToken();
+          }
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    refreshToken() {
+      axios.get(process.env.VUE_APP_REFRESH_URL || "http://localhost:8888/refreshToken")
+        .then(response => {
+          this.$root.TOKEN = response.data;
+          this.sendForm();
+        })
+        .catch(e => {
+          this.error = e.response.data.error.message;
+        });
     }
   }
 };
@@ -84,15 +126,30 @@ export default {
     font-weight: 600;
     background: #2a3757;
     opacity: 0.8;
-    position: relative;
     &-danger {
       background: rgb(220, 21, 21);
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%);
       &:before {
         content: "\26A0";
         position: absolute;
         left: 15px;
         top: 50%;
         transform: translateY(-50%);
+      }
+    }
+    &-loading {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%);
+      &:before {
+        content: "\21BB";
+        position: absolute;
+        left: 15px;
+        transform: translateY(-50%);
+        animation:spin 4s linear infinite;
+        @keyframes spin {0% {transform: rotate(0deg);}100% {transform:rotate(360deg);}}
       }
     }
   }
