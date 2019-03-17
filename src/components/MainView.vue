@@ -2,7 +2,7 @@
   <div class="main">
     <h1 class="title">Search</h1>
     <div class="alert alert-danger" v-if="error">{{ error }}</div>
-    <div class="alert alert-loading" v-if="loading">Loading...</div>
+    <div class="alert alert-loading" v-if="loading">Fetching data...</div>
     <form @submit.prevent="sendForm" ref="form">
       <div class="search">
         <input v-model="text" type="text" placeholder="Search for song...">
@@ -63,7 +63,7 @@ export default {
       this.loading = true;
       axios
         .get(
-          `https://api.spotify.com/v1/search?query=${this.text}&type=${this.type}`,
+          `https://api.spotify.com/v1/search?query=${this.text}&type=${this.type}&limit=18`,
           {
             headers: {
               Authorization: `Bearer ${this.$root.TOKEN}`
