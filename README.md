@@ -10,6 +10,13 @@ Simple web player using Spotify API on Vue
 * Create user login ?
 * ...
 
+In order to use Backend server to receive/update token use `export` command to add URL's.
+Or create .env file and add:
+```
+VUE_APP_TOKEN_URL=[URL TO TOKEN]
+VUE_APP_REFRESH_URL=[URL TO REFRESH TOKEN]
+```
+
 ## Project setup
 ```
 npm install
