@@ -16,14 +16,16 @@
       </a>
     </div>
     <div v-else class="track-search-result">
-      <a class="item" href="#" v-for="item in items.data" :key="item.id">
-        <span>
-          <span class="info">
-            <p class="name">{{ item.name }}</p>
-            <p class="artist">{{ item.artists[0].name }}</p>
-          </span>
-        </span>
-      </a>
+      <router-link
+        class="item"
+        tag="a"
+        v-for="item in items.data"
+        :key="item.id"
+        :to="{ name: 'playTrack', params: { id: item.id } }"
+      >
+        <p class="name">{{ item.name }}</p>
+        <p class="artist">{{ item.artists[0].name }}</p>
+      </router-link>
     </div>
   </div>
 </template>
@@ -37,9 +39,6 @@ export default {
     items: {
       required: true
     }
-  },
-  data() {
-    return {};
   },
   created() {
     if (this.items === undefined) {
