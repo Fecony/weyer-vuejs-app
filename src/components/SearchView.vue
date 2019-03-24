@@ -1,5 +1,5 @@
 <template>
-  <div class="main" v-if="items">
+  <div class="main" v-if="items.data.length > 0">
     <router-link class="back" tag="a" to="/">
       <i class="arrow-icon"></i>
     </router-link>
@@ -22,11 +22,16 @@
         v-for="item in items.data"
         :key="item.id"
         :to="{ name: 'playTrack', params: { id: item.id } }"
-      >
-        <p class="name">{{ item.name }}</p>
-        <p class="artist">{{ item.artists[0].name }}</p>
+      >{{ item.name }} - {{ item.artists[0].name }}
       </router-link>
     </div>
+  </div>
+  <div class="main" v-else>
+    <router-link class="back" tag="a" to="/">
+      <i class="arrow-icon"></i>
+    </router-link>
+    <h1>Sorry nothing found</h1>
+    <h1 style="transform: rotate(90deg)">:(</h1>
   </div>
 </template>
 
@@ -126,6 +131,35 @@ export default {
         }
         &:hover {
           opacity: 1;
+        }
+      }
+    }
+  }
+  .track-search-result {
+    .item {
+      display: block;
+      text-align: left;
+      border-radius: 4px;
+      border: 1px solid;
+      margin: 5px 250px;
+      padding: 5px 5px 5px 30px;
+      color: #263759;
+      position: relative;
+      text-decoration: none;
+      &:before {
+        content: '\27A4';
+        color: #263759;
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        left: .5em;
+      }
+      &:hover {
+        background: #263759;
+        color: white;
+        font-weight: bold;
+        &:before {
+          color: white;
         }
       }
     }

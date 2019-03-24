@@ -5,7 +5,7 @@
     <div class="alert alert-loading" v-if="loading">Fetching data...</div>
     <form @submit.prevent="sendForm" ref="form">
       <div class="search">
-        <input v-model="text" type="text" placeholder="Search for song...">
+        <input v-model="text" type="search" placeholder="Search for song..." autofocus/>
         <a @click="changeType" class="icon">
           <i :class="type"></i>
         </a>
@@ -26,7 +26,7 @@ export default {
       type: "track",
       text: "",
       disabled: true,
-      loading: false,
+      loading: true,
       error: null,
       items: []
     };
@@ -44,7 +44,6 @@ export default {
       this.type = this.type === "track" ? "album" : "track";
     },
     async fetch() {
-      this.loading = true;
       await axios.get(process.env.VUE_APP_TOKEN_URL || "http://localhost:8888/")
         .then(response => {
           this.$root.TOKEN = response.data;
@@ -60,39 +59,34 @@ export default {
         });
     },
     sendForm() {
-      this.loading = true;
-      axios
-        .get(
-          `https://api.spotify.com/v1/search?query=${this.text}&type=${this.type}&limit=18`,
-          {
-            headers: {
-              Authorization: `Bearer ${this.$root.TOKEN}`
-            }
+      axios.get(`https://api.spotify.com/v1/search?query=${this.text}&type=${this.type}&limit=18`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.$root.TOKEN}`
+        }
+      })
+      .then(response => {
+        var type = this.type + "s";
+        this.items = {
+          type,
+          data: response.data[`${type}`].items
+        };
+        router.push({
+          name: "search",
+          params: {
+            results: this.items
           }
-        )
-        .then(response => {
-          var type = this.type + "s";
-          this.items = {
-            type,
-            data: response.data[`${type}`].items
-          };
-          router.push({
-            name: "search",
-            params: {
-              results: this.items
-            }
-          });
-          this.text = "";
-        })
-        .catch(e => {
-          this.error = e.response.data.error.message;
-          if (e.response.data.error.status == 401) {
-            this.refreshToken();
-          }
-        })
-        .finally(() => {
-          this.loading = false;
         });
+      })
+      .catch(e => {
+        this.error = e.response.data.error.message;
+        if (e.response.data.error.status == 401) {
+          this.refreshToken();
+        }
+      })
+      .finally(() => {
+        this.loading = false;
+      });
     },
     refreshToken() {
       axios.get(process.env.VUE_APP_REFRESH_URL || "http://localhost:8888/refreshToken")

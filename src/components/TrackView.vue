@@ -6,7 +6,8 @@
     <h1 class="title">Track</h1>
     {{trackData.name}}
     <audio controls>
-      <source :src="trackData.preview_url" type="audio/wav">
+      <source :src="trackData.preview_url">
+      <p>Your browser doesn't support audio</p>
     </audio>
   </div>
 </template>
@@ -33,16 +34,16 @@ export default {
   },
   methods: {
     fetchTrack() {
-      axios
-        .get(`https://api.spotify.com/v1/tracks/${this.track}`, {
-          headers: {
-            Authorization: `Bearer ${this.$root.TOKEN}`
-          }
-        })
-        .then(response => {
-          console.log(response);
-          this.trackData = response.data;
-        });
+      axios.get(`https://api.spotify.com/v1/tracks/${this.track}`, 
+      {
+        headers: {
+          Authorization: `Bearer ${this.$root.TOKEN}`
+        }
+      })
+      .then(response => {
+        console.log(response);
+        this.trackData = response.data;
+      });
     }
   }
 };

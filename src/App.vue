@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <CurrentTime></CurrentTime>
-    <router-view/>
+    <transition name="moveIn">
+      <router-view/>
+    </transition>
   </div>
 </template>
 
@@ -31,6 +33,17 @@ export default {
     &.router-link-exact-active {
       color: #42b983;
     }
+  }
+}
+.moveIn-enter-active{
+  animation: fadeIn 1s ease-in;
+}
+@keyframes fadeIn{
+  0%{
+    opacity: 0;
+  }
+  100%{
+    opacity: 1;
   }
 }
 </style>
