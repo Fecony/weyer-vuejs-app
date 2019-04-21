@@ -1,10 +1,13 @@
 <template>
-  <div class="main">
-    <router-link class="back" tag="a" to="/">
+  <div class="main" v-if="trackData">
+    <a class="back" @click="goBack">
       <i class="arrow-icon"></i>
-    </router-link>
+    </a>
     <h1 class="title">Track</h1>
+    <div class="alert alert-danger" v-if="error">{{ error }}</div>
+    <div class="alert alert-loading" v-if="loading">Fetching data...</div>
     {{trackData.name}}
+    <img :src="trackData.album.images[0].url" width="100px">
     <audio controls>
       <source :src="trackData.preview_url">
       <p>Your browser doesn't support audio</p>
@@ -18,32 +21,56 @@ import router from "../router";
 
 export default {
   name: "TrackView",
-  props: ["track"],
-  created() {
-    if (this.track === undefined) {
-      router.push({
-        name: "home"
-      });
-    }
-    this.fetchTrack();
-  },
   data() {
     return {
-      trackData: []
+      id: "",
+      loading: true,
+      error: null,
+      trackData: null
     };
+  },
+  created() {
+    this.id = this.$route.params.id;
+    this.fetchTrack();
   },
   methods: {
     fetchTrack() {
-      axios.get(`https://api.spotify.com/v1/tracks/${this.track}`, 
-      {
-        headers: {
-          Authorization: `Bearer ${this.$root.TOKEN}`
-        }
-      })
-      .then(response => {
-        console.log(response);
-        this.trackData = response.data;
-      });
+      axios
+        .get(`https://api.spotify.com/v1/tracks/${this.id}`, {
+          headers: {
+            Authorization: `Bearer ${this.$root.TOKEN}`
+          }
+        })
+        .then(response => {
+          this.trackData = response.data;
+          this.error = null;
+        })
+        .catch(e => {
+          this.error = e.response.data.error.message;
+          if (e.response.data.error.status == 401) {
+            this.refreshToken();
+          }
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    refreshToken() {
+      axios
+        .get(
+          process.env.VUE_APP_REFRESH_URL ||
+            "http://localhost:8888/refreshToken"
+        )
+        .then(response => {
+          this.$root.TOKEN = response.data;
+          this.fetchTrack();
+        })
+        .catch(e => {
+          this.error = e.response.data.error.message;
+        });
+    },
+    goBack() {
+      this.$router.go(-1);
     }
   }
 };
@@ -58,7 +85,7 @@ export default {
     margin-bottom: 55px;
   }
   .back {
-    display: block;
+    cursor: pointer;
     i.arrow-icon {
       background: url("../assets/icons/arrow_icon.svg") no-repeat top left;
       width: 40px;

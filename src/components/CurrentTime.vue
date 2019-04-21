@@ -6,24 +6,24 @@
 
 <script>
 export default {
-  name: 'CurrentTime',
+  name: "CurrentTime",
   data() {
     return {
-      datenow: '...'
-    }
+      datenow: "..."
+    };
   },
   methods: {
     time() {
-      this.datenow = moment().format('HH:mm')
+      this.datenow = moment().format("HH:mm");
     }
   },
   mounted() {
-    this.interval = setInterval(this.time, 1000)
+    this.interval = setInterval(this.time, 1000);
   },
   beforeDestroy() {
-    clearInterval(this.interval)
+    clearInterval(this.interval);
   }
-}
+};
 </script>
 
 <style lang="less" scoped>

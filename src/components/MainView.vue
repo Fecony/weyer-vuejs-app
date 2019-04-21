@@ -5,12 +5,12 @@
     <div class="alert alert-loading" v-if="loading">Fetching data...</div>
     <form @submit.prevent="sendForm" ref="form">
       <div class="search">
-        <input v-model="text" type="search" placeholder="Search for song..." autofocus/>
+        <input v-model="text" type="search" placeholder="Search for song..." autofocus>
         <a @click="changeType" class="icon">
           <i :class="type"></i>
         </a>
       </div>
-      <input :disabled="textIsEmpty" type="submit" class="search-btn" value="Search">
+      <input :disabled="isEmpty" type="submit" class="search-btn" value="Search">
     </form>
   </div>
 </template>
@@ -27,15 +27,14 @@ export default {
       text: "",
       disabled: true,
       loading: true,
-      error: null,
-      items: []
+      error: null
     };
   },
   created() {
     this.fetch();
   },
   computed: {
-    textIsEmpty: function() {
+    isEmpty: function() {
       return this.text.length == 0;
     }
   },
@@ -44,7 +43,8 @@ export default {
       this.type = this.type === "track" ? "album" : "track";
     },
     async fetch() {
-      await axios.get(process.env.VUE_APP_TOKEN_URL || "http://localhost:8888/")
+      await axios
+        .get(process.env.VUE_APP_TOKEN_URL || "http://localhost:8888/")
         .then(response => {
           this.$root.TOKEN = response.data;
           this.text = "";
@@ -52,51 +52,16 @@ export default {
         })
         .catch(e => {
           this.error = e.response.data.error.message;
-          console.log(e);
         })
         .finally(() => {
           this.loading = false;
         });
     },
     sendForm() {
-      axios.get(`https://api.spotify.com/v1/search?query=${this.text}&type=${this.type}&limit=18`,
-      {
-        headers: {
-          Authorization: `Bearer ${this.$root.TOKEN}`
-        }
-      })
-      .then(response => {
-        var type = this.type + "s";
-        this.items = {
-          type,
-          data: response.data[`${type}`].items
-        };
-        router.push({
-          name: "search",
-          params: {
-            results: this.items
-          }
-        });
-      })
-      .catch(e => {
-        this.error = e.response.data.error.message;
-        if (e.response.data.error.status == 401) {
-          this.refreshToken();
-        }
-      })
-      .finally(() => {
-        this.loading = false;
+      router.push({
+        name: "search",
+        query: { query: this.text, type: this.type }
       });
-    },
-    refreshToken() {
-      axios.get(process.env.VUE_APP_REFRESH_URL || "http://localhost:8888/refreshToken")
-        .then(response => {
-          this.$root.TOKEN = response.data;
-          this.sendForm();
-        })
-        .catch(e => {
-          this.error = e.response.data.error.message;
-        });
     }
   }
 };
@@ -142,8 +107,15 @@ export default {
         position: absolute;
         left: 15px;
         transform: translateY(-50%);
-        animation:spin 4s linear infinite;
-        @keyframes spin {0% {transform: rotate(0deg);}100% {transform:rotate(360deg);}}
+        animation: spin 4s linear infinite;
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
       }
     }
   }
@@ -244,6 +216,13 @@ export default {
     .alert {
       margin-bottom: 20px;
       width: 85%;
+    }
+  }
+}
+@media (min-width: 320px) and (max-width: 480px) {
+  .main {
+    .search {
+      width: 90%;
     }
   }
 }
