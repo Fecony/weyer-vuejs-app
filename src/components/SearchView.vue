@@ -48,7 +48,8 @@ export default {
       error: null,
       items: [],
       query: "",
-      type: ""
+      type: "",
+      baseURL: process.env.VUE_APP_BASE_URL || "http://localhost:8888"
     };
   },
   created() {
@@ -59,42 +60,13 @@ export default {
   methods: {
     fetchData() {
       axios
-        .get(
-          `https://api.spotify.com/v1/search?query=${this.query}&type=${
-            this.type
-          }&limit=18`,
-          {
-            headers: {
-              Authorization: `Bearer ${this.$root.TOKEN}`
-            }
-          }
-        )
+        .get(`${this.baseURL}/tracks?query=${this.query}&type=${this.type}`)
         .then(response => {
-          this.items = response.data[`${this.type}s`].items;
+          this.items = response.data;
           this.error = null;
-        })
-        .catch(e => {
-          this.error = e.response.data.error.message;
-          if (e.response.data.error.status == 401) {
-            this.refreshToken();
-          }
         })
         .finally(() => {
           this.loading = false;
-        });
-    },
-    refreshToken() {
-      axios
-        .get(
-          process.env.VUE_APP_REFRESH_URL ||
-            "http://localhost:8888/refreshToken"
-        )
-        .then(response => {
-          this.$root.TOKEN = response.data;
-          this.fetchData();
-        })
-        .catch(e => {
-          this.error = e.response.data.error.message;
         });
     }
   },

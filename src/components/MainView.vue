@@ -1,8 +1,6 @@
 <template>
   <div class="main">
     <h1 class="title">Search</h1>
-    <div class="alert alert-danger" v-if="error">{{ error }}</div>
-    <div class="alert alert-loading" v-if="loading">Fetching data...</div>
     <form @submit.prevent="sendForm" ref="form">
       <div class="search">
         <input v-model="text" type="search" placeholder="Search for song..." autofocus>
@@ -16,7 +14,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import router from "../router";
 
 export default {
@@ -25,13 +22,8 @@ export default {
     return {
       type: "track",
       text: "",
-      disabled: true,
-      loading: true,
-      error: null
+      disabled: true
     };
-  },
-  created() {
-    this.fetch();
   },
   computed: {
     isEmpty: function() {
@@ -41,21 +33,6 @@ export default {
   methods: {
     changeType() {
       this.type = this.type === "track" ? "album" : "track";
-    },
-    async fetch() {
-      await axios
-        .get(process.env.VUE_APP_TOKEN_URL || "http://localhost:8888/")
-        .then(response => {
-          this.$root.TOKEN = response.data;
-          this.text = "";
-          this.error = null;
-        })
-        .catch(e => {
-          this.error = e.response.data.error.message;
-        })
-        .finally(() => {
-          this.loading = false;
-        });
     },
     sendForm() {
       router.push({

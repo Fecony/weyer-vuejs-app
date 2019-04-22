@@ -26,7 +26,8 @@ export default {
       id: "",
       loading: true,
       error: null,
-      trackData: null
+      trackData: null,
+      baseURL: process.env.VUE_APP_BASE_URL || "http://localhost:8888"
     };
   },
   created() {
@@ -36,37 +37,13 @@ export default {
   methods: {
     fetchTrack() {
       axios
-        .get(`https://api.spotify.com/v1/tracks/${this.id}`, {
-          headers: {
-            Authorization: `Bearer ${this.$root.TOKEN}`
-          }
-        })
+        .get(`${this.baseURL}/tracks/${this.id}`)
         .then(response => {
           this.trackData = response.data;
           this.error = null;
         })
-        .catch(e => {
-          this.error = e.response.data.error.message;
-          if (e.response.data.error.status == 401) {
-            this.refreshToken();
-          }
-        })
         .finally(() => {
           this.loading = false;
-        });
-    },
-    refreshToken() {
-      axios
-        .get(
-          process.env.VUE_APP_REFRESH_URL ||
-            "http://localhost:8888/refreshToken"
-        )
-        .then(response => {
-          this.$root.TOKEN = response.data;
-          this.fetchTrack();
-        })
-        .catch(e => {
-          this.error = e.response.data.error.message;
         });
     },
     goBack() {
