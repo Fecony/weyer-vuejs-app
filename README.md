@@ -15,7 +15,7 @@ Simple web player using Spotify API on Vue
 
 In order to use Backend server to receive/update token use `export` command to add URL's. Otherwise it will use https://localhost:8888
 
-#### Note: Used [<img src="https://www.freeiconspng.com/uploads/github-logo-icon-5.png" style="width: 25px; vertical-align:middle;">](https://github.com/Fecony/weyer-nodejs-server) as backend server hosted on Heroku.
+#### Note: Used [<img src="https://i.imgur.com/miTQnUg.png">](https://github.com/Fecony/weyer-nodejs-server) as backend server hosted on Heroku.
 
 ```
 npm install
